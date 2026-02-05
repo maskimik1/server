@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ДОБАВЛЕН МЕТА-ТЕГ CSRF -->
+    <meta name="csrf-token" content="" id="csrf-token-meta">
+    <title>Профиль - LegacyNet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* Стили для проверки активности */
+        .alive-check-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .alive-check-section h4 {
+            color: #4CAF50;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+
+        .alive-check-section h4 i {
+            color: #4CAF50;
+        }
+
+        .status-loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .alive-check-details {
+            margin: 15px 0;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(76, 175, 80, 0.08);
+            border-radius: 6px;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+        }
+
+        .status-label {
+            font-weight: 500;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .status-value {
+            font-weight: bold;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .status-value.confirmed {
+            color: #4CAF50;
+        }
+
+        .status-value.pending {
+            color: #FF9800;
+        }
+
+        .status-value.expired {
+            color: #f44336;
+        }
+
+        .status-value.neutral {
+            color: #4CAF50;
+        }
+
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: white;
+            font-size: 10px;
+        }
+
+        .status-icon.confirmed {
+            background: #4CAF50;
+        }
+
+        .status-icon.pending {
+            background: #FF9800;
+        }
+
+        .status-icon.expired {
+            background: #f44336;
+        }
+
+        .countdown {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #4CAF50;
+        }
+
+        .alive-check-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .alive-check-actions .green-button {
+            flex: 1;
+            min-width: 150px;
+            font-size: 14px;
+        }
+
+        .alive-check-actions .green-button i {
+            margin-right: 8px;
+        }
+
+        .status-note {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 152, 0, 0.1);
+            border-radius: 6px;
+            border-left: 3px solid #FF9800;
+            font-size: 12px;
+        }
+
+        .status-note p {
+            margin: 5px 0;
+            color: #FF9800;
+        }
+
+        .status-note i {
+            color: #FF9800;
+            margin-right: 8px;
+        }
+
+        .alive-check-disabled {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .alive-check-disabled i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+
+        .alive-check-disabled a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        .alive-check-disabled a:hover {
+            text-decoration: underline;
+        }
+
+        /* Стили для модальных окон */
+        .activation-methods {
+            margin: 20px 0;
+        }
+
+        .method-option {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .method-option:hover {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .method-option input[type="checkbox"],
+        .method-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .method-option label {
+            cursor: pointer;
+            display: block;
+        }
+
+        .method-option strong {
+            color: #4CAF50;
+            font-size: 16px;
+        }
+
+        .method-option p {
+            margin: 5px 0 0 0;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .method-note {
+            font-style: italic;
+            color: #FF9800 !important;
+            font-size: 13px;
+        }
+
+        .trusted-code-display {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 5px;
+            border-left: 3px solid #4CAF50;
+        }
+
+        .code-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .code-input-group label {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 14px;
+        }
+
+        .code-input-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .code-input-field input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .code-hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .settings-description {
+            color: #aaa;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .settings-note {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #888;
+            text-align: center;
+        }
+
+        .info-section {
+            margin: 20px 0;
+        }
+
+        .info-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .info-card i {
+            color: #4CAF50;
+            font-size: 20px;
+            margin-top: 5px;
+        }
+
+        .info-card h4 {
+            margin: 0 0 5px 0;
+            color: #4CAF50;
+            font-size: 16px;
+        }
+
+        .info-card p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .method-settings {
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            border-left: 3px solid #4CAF50;
+        }
+
+        .green-button.small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        /* Стили для личных данных */
+        .privacy-options {
+            margin: 20px 0;
+        }
+
+        .privacy-option {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .privacy-option:hover {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .privacy-option input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .privacy-option label {
+            cursor: pointer;
+            display: block;
+        }
+
+        .privacy-option strong {
+            color: #4CAF50;
+            font-size: 16px;
+        }
+
+        .privacy-option p {
+            margin: 5px 0 0 0;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .personal-data-fields {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            border-left: 3px solid #4CAF50;
+        }
+
+        .personal-data-fields .form-group {
+            margin-bottom: 15px;
+        }
+
+        .personal-data-fields label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .personal-data-fields input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            color: white;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        /* Упрощенное поле даты */
+        .date-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            color: white;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        /* Стили для статистики профиля */
+        .profile-stats {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .profile-stats h4 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+
+        .stat-item i {
+            width: 20px;
+            color: #4CAF50;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .stat-label {
+            flex: 1;
+            font-weight: 500;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        /* Стили для информации о завещании */
+        .legacy-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .legacy-info h4 {
+            color: #2196F3;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+
+        .info-item i {
+            width: 20px;
+            color: #2196F3;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .info-item span:first-of-type {
+            flex: 1;
+            font-weight: 500;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .info-item span:last-of-type {
+            font-weight: bold;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        /* === НОВЫЕ СТИЛИ ДЛЯ КОНТАКТОВ С ТЕЛЕФОНАМИ === */
+        .contact-item {
+            display: block;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .contact-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .contact-email {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .contact-phone-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .contact-phone-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .contact-phone-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .phone-hint {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .premium-badge-contact {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            vertical-align: middle;
+        }
+
+        .delete-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 30px;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .delete-button:hover {
+            background: #d32f2f;
+        }
+
+        /* Стиль для связи почты и телефона */
+        .contact-pair {
+            position: relative;
+        }
+
+        .contact-pair:after {
+            content: "";
+            position: absolute;
+            left: 15px;
+            top: 40px;
+            bottom: 10px;
+            width: 2px;
+            background: rgba(76, 175, 80, 0.3);
+            border-radius: 1px;
+        }
+
+        /* === МОБИЛЬНЫЕ СТИЛИ (добавлены из мобильной версии) === */
+        @media (max-width: 768px) {
+            /* Базовые мобильные стили */
+            body {
+                overflow-x: hidden;
+                max-width: 100%;
+                font-size: 14px;
+            }
+            
+            .container {
+                max-width: 100%;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            /* Адаптивность для проверки активности */
+            .alive-check-actions {
+                flex-direction: column;
+            }
+            
+            .alive-check-actions .green-button {
+                width: 100%;
+            }
+            
+            .status-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            /* Мобильная адаптация профиля */
+            .profile .container {
+                padding: 8px;
+            }
+            
+            .profile-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
+            }
+            
+            .profile-card {
+                width: 100%;
+                padding: 12px;
+                margin-bottom: 0;
+                box-sizing: border-box;
+            }
+            
+            h2 {
+                font-size: 1.4rem;
+                text-align: center;
+                margin-bottom: 12px;
+            }
+            
+            h3 {
+                font-size: 1.1rem;
+                margin-bottom: 10px;
+            }
+            
+            .status-block {
+                font-size: 12px;
+                margin: 8px 0;
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .master-password-section h4 {
+                font-size: 13px;
+                margin-bottom: 8px;
+            }
+            
+            .master-password-section .green-button {
+                width: 100%;
+                padding: 10px;
+                font-size: 13px;
+                margin-bottom: 8px;
+            }
+            
+            .password-hint {
+                font-size: 11px;
+                margin-top: 6px;
+            }
+            
+            .profile-card .green-button {
+                width: 100%;
+                margin-bottom: 8px;
+                padding: 10px;
+                font-size: 13px;
+                display: block;
+            }
+            
+            #profile-email {
+                font-size: 12px;
+                word-break: break-all;
+            }
+            
+            .status-label, .status-value {
+                width: 100%;
+                text-align: left;
+                font-size: 12px;
+            }
+            
+            /* Мобильные версии компонентов */
+            .alive-check-section {
+                margin: 15px 0;
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            .alive-check-section h4 {
+                gap: 8px;
+                font-size: 15px;
+            }
+
+            .status-loading {
+                padding: 12px;
+                font-size: 13px;
+            }
+
+            .alive-check-details {
+                margin: 10px 0;
+            }
+
+            .status-item {
+                margin-bottom: 8px;
+                padding: 8px;
+            }
+
+            .status-label {
+                font-size: 13px;
+            }
+
+            .status-value {
+                font-size: 13px;
+            }
+
+            .status-icon {
+                width: 18px;
+                height: 18px;
+                margin-right: 8px;
+                font-size: 9px;
+            }
+
+            .countdown {
+                font-size: 13px;
+            }
+
+            .alive-check-actions .green-button {
+                font-size: 13px;
+                padding: 10px;
+            }
+
+            .alive-check-actions .green-button i {
+                margin-right: 6px;
+            }
+
+            .status-note {
+                margin-top: 8px;
+                padding: 8px;
+                font-size: 11px;
+            }
+
+            .status-note p {
+                margin: 4px 0;
+            }
+
+            .status-note i {
+                margin-right: 6px;
+            }
+
+            .alive-check-disabled {
+                padding: 12px;
+                font-size: 13px;
+            }
+
+            .alive-check-disabled i {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+
+            /* Стили для модальных окон на мобильных */
+            .modal-content {
+                width: 95%;
+                max-height: 90vh;
+                overflow-y: auto;
+                padding: 12px;
+                margin: 10px auto;
+                box-sizing: border-box;
+            }
+            
+            #activation-settings-modal .modal-content,
+            #personal-data-modal .modal-content {
+                width: 95%;
+                max-width: 95%;
+            }
+            
+            .form-group {
+                margin-bottom: 10px;
+            }
+            
+            .form-group input, .form-group select {
+                padding: 8px;
+                font-size: 13px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .modal-content .green-button {
+                width: 100%;
+                margin-bottom: 8px;
+                padding: 10px;
+                font-size: 13px;
+            }
+            
+            /* Убираем горизонтальный скролл */
+            html, body {
+                overflow-x: hidden;
+                position: relative;
+            }
+            
+            .header .container {
+                padding: 0 10px;
+            }
+            
+            .nav {
+                display: flex;
+                gap: 8px;
+            }
+            
+            /* Мобильные стили для компонентов */
+            .activation-methods {
+                margin: 15px 0;
+            }
+
+            .method-option {
+                margin-bottom: 10px;
+                padding: 10px;
+                border-radius: 6px;
+            }
+
+            .method-option label {
+                font-size: 13px;
+            }
+
+            .method-option strong {
+                font-size: 14px;
+            }
+
+            .method-option p {
+                margin: 4px 0 0 0;
+                font-size: 12px;
+            }
+
+            .method-note {
+                font-size: 11px;
+            }
+
+            .trusted-code-display {
+                margin-top: 8px;
+                padding: 8px;
+                border-radius: 4px;
+            }
+
+            .code-input-group label {
+                font-size: 12px;
+            }
+
+            .code-input-field input {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            .code-hint {
+                font-size: 10px;
+                margin-top: 4px;
+            }
+
+            .settings-description {
+                margin-bottom: 12px;
+                font-size: 12px;
+            }
+
+            .settings-note {
+                margin-top: 12px;
+                font-size: 11px;
+            }
+
+            .info-section {
+                margin: 12px 0;
+            }
+
+            .info-card {
+                gap: 10px;
+                padding: 10px;
+                border-radius: 6px;
+                margin-bottom: 10px;
+            }
+
+            .info-card i {
+                font-size: 16px;
+                margin-top: 2px;
+            }
+
+            .info-card h4 {
+                margin: 0 0 4px 0;
+                font-size: 14px;
+            }
+
+            .info-card p {
+                font-size: 12px;
+            }
+
+            .method-settings {
+                margin-top: 8px;
+                padding: 10px;
+                border-radius: 4px;
+            }
+
+            .green-button.small {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .privacy-options {
+                margin: 12px 0;
+            }
+
+            .privacy-option {
+                margin-bottom: 10px;
+                padding: 10px;
+                border-radius: 6px;
+            }
+
+            .privacy-option label {
+                font-size: 13px;
+            }
+
+            .privacy-option strong {
+                font-size: 14px;
+            }
+
+            .privacy-option p {
+                margin: 4px 0 0 0;
+                font-size: 12px;
+            }
+
+            .personal-data-fields {
+                margin-top: 10px;
+                padding: 10px;
+                border-radius: 4px;
+            }
+
+            .personal-data-fields .form-group {
+                margin-bottom: 10px;
+            }
+
+            .personal-data-fields label {
+                margin-bottom: 4px;
+                font-size: 12px;
+            }
+
+            .personal-data-fields input {
+                padding: 8px;
+                font-size: 13px;
+            }
+
+            .date-input {
+                padding: 8px;
+                font-size: 13px;
+            }
+
+            .profile-stats {
+                margin: 12px 0;
+                padding: 10px;
+                border-radius: 6px;
+            }
+
+            .profile-stats h4 {
+                margin-bottom: 10px;
+                font-size: 14px;
+            }
+
+            .stat-item {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 8px;
+                padding: 6px 0;
+            }
+
+            .stat-item i {
+                width: 20px;
+                margin-right: 8px;
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
+
+            .stat-label {
+                font-size: 12px;
+                margin-bottom: 2px;
+            }
+
+            .stat-value {
+                font-size: 12px;
+                width: 100%;
+            }
+
+            .legacy-info {
+                margin-top: 12px;
+                padding: 10px;
+                border-radius: 6px;
+            }
+
+            .legacy-info h4 {
+                margin-bottom: 10px;
+                font-size: 14px;
+            }
+
+            .info-item {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 8px;
+                padding: 6px 0;
+            }
+
+            .info-item i {
+                width: 20px;
+                margin-right: 8px;
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
+
+            .info-item span:first-of-type {
+                font-size: 12px;
+                margin-bottom: 2px;
+            }
+
+            .info-item span:last-of-type {
+                font-size: 12px;
+                width: 100%;
+            }
+            
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Мобильные стили для контактов */
+            .contact-item {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+            
+            .contact-email, .contact-phone-input {
+                font-size: 16px; /* Убирает зум на iOS */
+                padding: 12px;
+            }
+            
+            .delete-button {
+                width: 28px;
+                height: 28px;
+                font-size: 16px;
+                line-height: 28px;
+                top: 8px;
+                right: 8px;
+            }
+            
+            .phone-hint {
+                font-size: 11px;
+            }
+            
+            .contact-pair:after {
+                left: 12px;
+                top: 44px;
+            }
+        }
+        
+        /* Планшет */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .profile-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 15px;
+            }
+            
+            .profile-card {
+                padding: 15px;
+            }
+            
+            .container {
+                max-width: 95%;
+            }
+        }
+        
+        /* Десктоп */
+        @media (min-width: 1025px) {
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            
+            .contact-item {
+                padding: 15px;
+            }
+            
+            .contact-email, .contact-phone-input {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body class="dark">
+
+    <header class="header">
+        <div class="container">
+            <div class="logo" onclick="window.location.href='/'">
+                <span data-lang="logo">LegacyNet</span>
+                <i class="fas fa-shield-alt logo-shield"></i>
+            </div>
+            <nav class="nav">
+                <button class="green-button" id="register-button" data-lang="registration">Регистрация</button>
+                <button class="green-button" id="login-button" data-lang="login">Вход</button>
+                <button class="green-button" id="user-menu-button" style="display: none;" data-lang="menu">Меню</button>
+                <div id="user-submenu" class="submenu">
+                    <a href="/profile" data-lang="profile">Профиль</a>
+                    <a href="/settings" data-lang="settings">Настройки</a>
+                    <a href="/legacy" data-lang="legacy">Завещание</a>
+                    <a href="/premium" data-lang="premium">Премиум</a>
+                    <a href="/verification" data-lang="death_verification">Подтверждение</a>
+                    <a href="/support" data-lang="support">Поддержка</a>
+                    <a href="#" onclick="logout()" data-lang="logout">Выход</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="profile">
+        <div class="container">
+            <h2 data-lang="personal_profile">Личный профиль</h2>
+            <div class="profile-grid">
+                <div class="profile-card">
+                    <h3 data-lang="information_security">Информация и безопасность</h3>
+                    <p id="profile-email" data-lang="email_loading">Email: Загрузка...</p>
+                    
+                    <div class="status-block">
+                        <span data-lang="legacy_status">Статус завещания:</span>
+                        <span id="status-text" class="status-text">Не создано</span>
+                    </div>
+                    
+                    <!-- ИСПРАВЛЕННАЯ СТАТИСТИКА -->
+                    <div class="profile-stats">
+                        <h4>Статистика аккаунта</h4>
+                        <div class="stat-item">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span class="stat-label">Дата регистрации:</span>
+                            <span id="registration-date" class="stat-value">Загрузка...</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span class="stat-label">Последний вход:</span>
+                            <span id="last-login" class="stat-value">Загрузка...</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span class="stat-label">Уровень безопасности:</span>
+                            <span id="security-level" class="stat-value">Высокий</span>
+                        </div>
+                    </div>
+                    
+                    <p id="current-plan">
+                        <span data-lang="current_plan">Текущий тарифный план:</span> 
+                        <span id="subscription-plan" class="plan-link">Загрузка...</span>
+                    </p>
+                    <!-- ЭТОТ ЭЛЕМЕНТ ДОЛЖЕН БЫТЬ - проверь что он есть -->
+                    <p id="subscription-expiry" style="display: none;"></p>
+                    
+                    <!-- УБРАНА СТРОКА ПРО ДВУХФАКТОРНУЮ АУТЕНТИФКАЦИЮ -->
+                    
+                    <div class="master-password-section">
+                        <h4>Управление мастер-паролем</h4>
+                        <button class="green-button" id="master-password-button">Создать мастер-пароль</button>
+                        <p class="password-hint">Пароль используется для шифрования ваших данных. Убедитесь, что он надежный.</p>
+                    </div>
+                    
+                    <!-- Блок проверки активности -->
+                    <div class="alive-check-section">
+                      <h4><i class="fas fa-heartbeat"></i> Проверка активности</h4>
+                      
+                      <div class="alive-check-status" id="alive-check-status">
+                        <div class="status-loading">
+                          <i class="fas fa-spinner fa-spin"></i> Загрузка статуса...
+                        </div>
+                      </div>
+                      
+                      <button class="green-button" id="send-alive-check-button" style="display: none;">
+                        <i class="fas fa-paper-plane"></i> Отправить проверку сейчас
+                      </button>
+                      
+                      <p class="password-hint" id="alive-check-hint">
+                        Система будет автоматически отправлять проверочные письма для подтверждения вашей активности
+                      </p>
+                    </div>
+                    
+                    <!-- УДАЛЕНА КНОПКА КОНТАКТОВ ОТСЮДА -->
+                </div>
+                
+                <div class="profile-card profile-legacy">
+                    <h3 data-lang="legacy_management">Управление завещания</h3>
+                    <!-- УДАЛЕНЫ КНОПКИ "Перейти к завещанию" и "Скачать копию" -->
+                    
+                    <!-- НОВЫЕ КНОПКИ ДЛЯ ВСПЛЫВАЮЩИХ ОКОН -->
+                    <button class="green-button" id="activation-settings-button">Активация завещания</button>
+                    <button class="green-button" id="personal-data-button">Личные данные</button>
+                    
+                    <!-- ПЕРЕНЕСЕНА КНОПКА КОНТАКТОВ СЮДА -->
+                    <button class="green-button" id="contacts-button" data-lang="contacts">Контакты</button>
+                    
+                    <!-- ЗАМЕНЕННЫЙ БЛОК legacy-info -->
+                    <div class="legacy-info" style="border-left-color: #4CAF50;">
+                        <h4 style="color: #4CAF50;">Информация о завещании</h4>
+                        <div class="info-item">
+                            <i class="fas fa-edit" style="color: #4CAF50;"></i>
+                            <span>Последнее обновление:</span>
+                            <span id="last-updated">—</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-users" style="color: #4CAF50;"></i>
+                            <span>Назначенные контакты:</span>
+                            <span id="contacts-count">0</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-shield-alt" style="color: #4CAF50;"></i>
+                            <span>Метод шифрования:</span>
+                            <span id="encryption-method">—</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p data-lang="copyright">© 2025 LegacyNet. Все права защищены.</p>
+            <div class="footer-links">
+                <a href="#" data-lang="privacy_policy">Политика конфиденциальности</a>
+                <a href="#" data-lang="terms_of_use">Условия использования</a>
+                <a href="/claim" data-lang="claim_legacy">Получить завещание</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Модал авторизации -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-auth-modal">&times;</span>
+            <h2 id="modal-title" data-lang="auth_title">Регистрация / Вход</h2>
+            <p id="modal-message"></p>
+            <div class="form-group">
+                <label for="modal-email" data-lang="email">Email:</label>
+                <input type="email" id="modal-email">
+            </div>
+            <div class="form-group">
+                <label for="modal-password" data-lang="password">Пароль:</label>
+                <input type="password" id="modal-password">
+            </div>
+            <div class="form-group" id="confirm-password-group">
+                <label for="modal-confirm-password" data-lang="confirm_password">Подтвердите пароль:</label>
+                <input type="password" id="modal-confirm-password">
+            </div>
+            <button class="green-button" id="modal-button" data-lang="confirm">Подтвердить</button>
+            <p id="forgot-password-link" data-lang="forgot_password">Забыли пароль?</p>
+        </div>
+    </div>
+
+    <!-- Модал 2FA -->
+    <div id="2fa-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-2fa-modal">&times;</span>
+            <h2 data-lang="enter_code">Введите 6-значный код</h2>
+            <p data-lang="code_sent">Код отправлен на вашу почту.</p>
+            <div class="form-group">
+                <input type="text" id="2fa-code" maxlength="6" placeholder="000000">
+            </div>
+            <button id="2fa-button" class="green-button" data-lang="confirm">Подтвердить</button>
+        </div>
+    </div>
+
+    <!-- Модал восстановления пароля -->
+    <div id="reset-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-reset-modal">&times;</span>
+            <h2 data-lang="reset_password">Восстановление пароля</h2>
+            <div class="form-group">
+                <label for="reset-email" data-lang="email">Email:</label>
+                <input type="email" id="reset-email">
+                <button class="green-button" id="send-reset-code-button" data-lang="send_code">Отправить код</button>
+            </div>
+            <div id="reset-code-group" style="display: none;">
+                <div class="form-group">
+                    <label for="reset-code" data-lang="code">Код:</label>
+                    <input type="text" id="reset-code" maxlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="new-password" data-lang="new_password">Новый пароль:</label>
+                    <input type="password" id="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-new-password" data-lang="confirm_new_password">Подтвердите новый пароль:</label>
+                    <input type="password" id="confirm-new-password">
+                </div>
+                <button class="green-button" id="reset-password-button" data-lang="reset">Сменить пароль</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ОБНОВЛЕННЫЙ МОДАЛ КОНТАКТОВ -->
+    <div id="contacts-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-contacts-modal">&times;</span>
+            <h2 data-lang="contacts">Контакты</h2>
+            <div id="contacts-list"></div>
+            <button class="green-button" id="add-contact-button" data-lang="add_contact">Добавить</button>
+            <button class="green-button" id="save-contacts-button" data-lang="save">Сохранить</button>
+        </div>
+    </div>
+
+    <!-- НОВОЕ МОДАЛЬНОЕ ОКНО ДЛЯ МАСТЕР-ПАРОЛЯ (как в script.js) -->
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('changePasswordModal')">&times;</span>
+            <h2 id="master-password-title">Создание мастер-пароля</h2>
+            
+            <p id="master-password-warning" style="color: #FF9800; display: block;">
+                Внимание: мастер-пароль нельзя восстановить. Убедитесь, что вы его запомнили.
+            </p>
+            
+            <form id="changePasswordForm">
+                <div class="form-group" id="old-password-group" style="display:none;">
+                    <label for="old-master-password">Текущий мастер-пароль:</label>
+                    <input type="password" id="old-master-password">
+                </div>
+                <div class="form-group">
+                    <label for="new-master-password">Новый мастер-пароль:</label>
+                    <input type="password" id="new-master-password">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-new-master-password">Подтвердите новый пароль:</label>
+                    <input type="password" id="confirm-new-master-password">
+                </div>
+                <button type="submit" class="green-button" id="master-password-submit">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- НОВОЕ МОДАЛЬНОЕ ОКНО ДЛЯ АКТИВАЦИИ ЗАВЕЩАНИЯ -->
+    <div id="activation-settings-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <span class="close" id="close-activation-modal">&times;</span>
+            <h2><i class="fas fa-user-shield"></i> Настройки активации завещания</h2>
+            
+            <!-- ИНФОРМАЦИОННЫЕ БЛОКИ ПЕРЕНЕСЕНЫ СЮДА -->
+            <div class="info-section">
+                <div class="info-card">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <h4>Как это работает?</h4>
+                        <p>При подтверждении смерти ваше завещание автоматически отправляется всем указанным контактам.</p>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <i class="fas fa-users"></i>
+                    <div>
+                        <h4>Доверенные лица</h4>
+                        <p>Добавьте людей, которым вы доверяете подтвердить вашу смерть. Они получат специальные инструкции.</p>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <i class="fas fa-layer-group"></i>
+                    <div>
+                        <h4>Резервные методы</h4>
+                        <p>Рекомендуем настроить несколько методов активации для надежности.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="activation-methods">
+                <h3>Выберите методы активации</h3>
+                <p class="settings-description">Отметьте методы, которые могут быть использованы для активации вашего завещания. Можно выбрать несколько.</p>
+                
+                <div class="method-option checkbox-option">
+                    <input type="checkbox" id="method-trusted-code" name="activationMethods" value="trusted_contact_code">
+                    <label for="method-trusted-code">
+                        <strong>Код доверенного лица</strong>
+                        <p>Доверенное лицо вводит специальный код для мгновенной активации</p>
+                        <div id="trusted-code-display" class="trusted-code-display" style="display: none;">
+                            <div class="code-input-group">
+                                <label for="death-verification-code-input">Ваш код подтверждения:</label>
+                                <div class="code-input-field">
+                                    <input type="text" id="death-verification-code-input" placeholder="Придумайте и введите код">
+                                </div>
+                                <p class="code-hint">Сообщите этот код доверенному лицу оффлайн.</p>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="method-option checkbox-option">
+                    <input type="checkbox" id="method-email-check" name="activationMethods" value="email_check">
+                    <label for="method-email-check">
+                        <strong>Проверка по почте</strong>
+                        <p>Регулярная отправка проверочных писем с требованием ответа</p>
+                        <div id="email-check-settings" class="method-settings" style="display: none;">
+                            <div class="form-group">
+                                <label for="email-check-interval">Интервал проверки:</label>
+                                <select id="email-check-interval" class="styled-select">
+                                    <option value="30">Раз в месяц</option>
+                                    <option value="90">Раз в 3 месяца</option>
+                                    <option value="180">Раз в 6 месяцев</option>
+                                    <option value="365">Раз в год</option>
+                                </select>
+                                <p class="field-hint">Система будет отправлять проверочные письма с выбранным интервалом</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="email-check-grace">Период ожидания ответа:</label>
+                                <select id="email-check-grace" class="styled-select">
+                                    <option value="7">7 дней</option>
+                                    <option value="14">14 дней</option>
+                                    <option value="30">30 дней</option>
+                                </select>
+                                <p class="field-hint">Если в течение этого периода не будет ответа, завещание будет активировано</p>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <button class="green-button" id="save-activation-settings" onclick="saveActivationSettingsAndRefresh()">Сохранить настройки</button>
+            <p class="settings-note">Любой из выбранных методов может быть использован для активации вашего завещание. Рекомендуется выбрать несколько методов для надежности.</p>
+        </div>
+    </div>
+
+    <!-- НОВОЕ МОДАЛЬНОЕ ОКНО ДЛЯ ЛИЧНЫХ ДАННЫХ -->
+    <div id="personal-data-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" id="close-personal-data-modal">&times;</span>
+            <h2><i class="fas fa-user-circle"></i> Личные данные</h2>
+            <p class="settings-description">Настройте, как другие пользователи смогут найти вас для подтверждения смерти</p>
+            
+            <div class="privacy-options">
+                <div class="privacy-option checkbox-option">
+                    <input type="checkbox" id="privacy-email" name="privacyMethod" value="email" checked>
+                    <label for="privacy-email">
+                        <strong>Поиск по Email</strong>
+                        <p>Другие пользователи смогут найти меня по email-адресу</p>
+                        <p class="method-note">Рекомендуется для максимальной анонимности</p>
+                    </label>
+                </div>
+                
+                <div class="privacy-option checkbox-option">
+                    <input type="checkbox" id="privacy-personal" name="privacyMethod" value="personal_data">
+                    <label for="privacy-personal">
+                        <strong>Поиск по личным данным</strong>
+                        <p>Разрешить поиск по ФИО и дате рождения</p>
+                        <div id="personal-data-fields" class="personal-data-fields" style="display: none;">
+                            <div class="form-group">
+                                <label for="last-name">Фамилия:</label>
+                                <input type="text" id="last-name" placeholder="Иванов">
+                            </div>
+                            <div class="form-group">
+                                <label for="first-name">Имя:</label>
+                                <input type="text" id="first-name" placeholder="Иван">
+                            </div>
+                            <div class="form-group">
+                                <label for="middle-name">Отчество (если есть):</label>
+                                <input type="text" id="middle-name" placeholder="Иванович">
+                            </div>
+                            <div class="form-group">
+                                <label for="birth-date">Дата рождения:</label>
+                                <input type="date" id="birth-date" class="date-input">
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <button class="green-button" id="save-personal-data">Сохранить настройки</button>
+            <p class="settings-note">Эти настройки влияют только на возможность поиска вас для подтверждения смерти</p>
+        </div>
+    </div>
+
+    <!-- МОДАЛ С ИНФОРМАЦИЕЙ О ПРЕМИУМ-ФУНКЦИИ ТЕЛЕФОНОВ -->
+    <div id="premium-phone-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="closeModal('premium-phone-modal')">&times;</span>
+            <h2><i class="fas fa-crown" style="color: #FFD700;"></i> Premium-функция</h2>
+            <div style="text-align: center; margin: 20px 0;">
+                <i class="fas fa-phone-alt" style="font-size: 60px; color: #4CAF50; margin-bottom: 20px;"></i>
+                <h3>Добавление номеров телефона</h3>
+                <p>С Premium-подпиской вы можете указать номера телефонов наследников. Мы позвоним им, чтобы убедиться, что завещание получено, даже если оно попадет в спам.</p>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 3px solid #4CAF50;">
+                    <h4>Как это работает:</h4>
+                    <ul style="text-align: left; padding-left: 20px;">
+                        <li>Добавьте номер телефона к каждому email</li>
+                        <li>При активации завещания мы отправим SMS и позвоним</li>
+                        <li>Уведомим о получении завещания</li>
+                        <li>Повысим вероятность получения информации</li>
+                    </ul>
+                </div>
+                
+                <button class="green-button" onclick="closeModal('premium-phone-modal'); window.location.href='/premium'">
+                    <i class="fas fa-crown"></i> Перейти к Premium
+                </button>
+                <button class="green-button" style="background: #757575; margin-top: 10px;" onclick="closeModal('premium-phone-modal')">
+                    Понятно
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🔄 Загрузка профиля...');
+            
+            // 1. Проверяем наличие CSRF токена
+            let csrfToken = localStorage.getItem('csrf_token');
+            
+            // 2. Если нет - пытаемся получить
+            if (!csrfToken) {
+                console.log('❌ CSRF токен отсутствует, запрашиваем...');
+                csrfToken = await getCsrfToken(); // Используем функцию из script.js
+                
+                if (!csrfToken) {
+                    console.log('❌ Не удалось получить CSRF токен, требуется вход');
+                    showNotification('Требуется повторный вход');
+                    setTimeout(() => window.location.href = '/', 2000);
+                    return;
+                }
+            }
+            
+            // 3. Проверяем авторизацию ЧЕРЕЗ secureFetch (с CSRF)
+            try {
+                const response = await secureFetch(`${window.API_URL || '/api'}/check_auth`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    console.log('❌ Ошибка авторизации, статус:', response.status);
+                    window.location.href = '/';
+                    return;
+                }
+                
+                const data = await response.json();
+                console.log('check_auth ответ:', data);
+                
+                if (!data.success || !data.authenticated) {
+                    console.log('❌ Пользователь не авторизован');
+                    window.location.href = '/';
+                    return;
+                }
+                
+                console.log('✅ Пользователь авторизован:', data.email);
+                
+                // 4. Загружаем профиль
+                if (typeof loadProfile === 'function') {
+                    await loadProfile();
+                }
+                
+            } catch (error) {
+                console.error('❌ Ошибка проверки авторизации:', error);
+                window.location.href = '/';
+            }
+
+            // 🔴 ИСПРАВЛЕНО: Только проверка статуса кнопки мастер-пароля
+            const masterPasswordButton = document.getElementById('master-password-button');
+            if (masterPasswordButton && localStorage.getItem('masterPasswordCreated') === 'true') {
+                masterPasswordButton.textContent = 'Сменить мастер-пароль';
+            }
+
+            // Обработчики для кнопок профиля
+            const contactsButton = document.getElementById('contacts-button');
+            const activationSettingsButton = document.getElementById('activation-settings-button');
+            const personalDataButton = document.getElementById('personal-data-button');
+
+            if (contactsButton) {
+                contactsButton.addEventListener('click', () => {
+                    if (typeof openContactsModal === 'function') {
+                        openContactsModal();
+                    }
+                });
+            }
+
+            // Обработчики для новых модальных окон
+            if (activationSettingsButton) {
+                activationSettingsButton.addEventListener('click', function() {
+                    const modal = document.getElementById('activation-settings-modal');
+                    if (modal) {
+                        modal.style.display = 'flex';
+                        if (typeof loadActivationSettings === 'function') {
+                            loadActivationSettings();
+                        }
+                    }
+                });
+            }
+
+            if (personalDataButton) {
+                personalDataButton.addEventListener('click', function() {
+                    console.log('Personal data button clicked');
+                    const modal = document.getElementById('personal-data-modal');
+                    if (modal) {
+                        modal.style.display = 'flex';
+                        if (typeof loadPersonalData === 'function') {
+                            loadPersonalData();
+                        }
+                        
+                        // Инициализация обработчиков для чекбоксов
+                        const emailCheckbox = document.getElementById('privacy-email');
+                        const personalCheckbox = document.getElementById('privacy-personal');
+                        const personalDataFields = document.getElementById('personal-data-fields');
+                        
+                        function togglePersonalDataFields() {
+                            if (personalCheckbox && personalCheckbox.checked && personalDataFields) {
+                                personalDataFields.style.display = 'block';
+                            } else if (personalDataFields) {
+                                personalDataFields.style.display = 'none';
+                            }
+                        }
+                        
+                        if (emailCheckbox && personalCheckbox) {
+                            emailCheckbox.addEventListener('change', togglePersonalDataFields);
+                            personalCheckbox.addEventListener('change', togglePersonalDataFields);
+                            // Вызываем сразу, чтобы установить правильное состояние
+                            togglePersonalDataFields();
+                        }
+                        
+                        // Назначаем обработчик для кнопки сохранения
+                        const saveButton = document.getElementById('save-personal-data');
+                        if (saveButton) {
+                            saveButton.onclick = function() {
+                                console.log('Save personal data button clicked');
+                                if (typeof savePersonalData === 'function') {
+                                    savePersonalData();
+                                } else {
+                                    console.error('savePersonalData function not found');
+                                    showNotification('Ошибка: функция сохранения не найдена');
+                                }
+                            };
+                        }
+                    }
+                });
+            }
+
+            const closeActivationModal = document.getElementById('close-activation-modal');
+            const closePersonalDataModal = document.getElementById('close-personal-data-modal');
+            
+            if (closeActivationModal) closeActivationModal.addEventListener('click', () => closeModal('activation-settings-modal'));
+            if (closePersonalDataModal) closePersonalDataModal.addEventListener('click', () => closeModal('personal-data-modal'));
+
+            console.log('Profile page initialization completed');
+        });
+
+        // Правильная валидация поля даты рождения в профиле
+        document.addEventListener('DOMContentLoaded', function() {
+            const birthDateInput = document.getElementById('birth-date');
+            if (birthDateInput) {
+                birthDateInput.addEventListener('input', function(e) {
+                    let value = e.target.value;
+                    if (value.length > 10) {
+                        e.target.value = value.slice(0, 10);
+                    }
+                });
+                
+                const today = new Date().toISOString().split('T')[0];
+                birthDateInput.max = today;
+                birthDateInput.min = '1900-01-01';
+            }
+        });
+
+        function savePersonalData() {
+            const selectedMethods = [];
+            const emailCheckbox = document.getElementById('privacy-email');
+            const personalCheckbox = document.getElementById('privacy-personal');
+            
+            if (emailCheckbox && emailCheckbox.checked) {
+                selectedMethods.push('email');
+            }
+            if (personalCheckbox && personalCheckbox.checked) {
+                selectedMethods.push('personal_data');
+            }
+            
+            if (selectedMethods.length === 0) {
+                selectedMethods.push('email');
+                if (emailCheckbox) emailCheckbox.checked = true;
+            }
+
+            let personalData = {};
+            
+            if (selectedMethods.includes('personal_data')) {
+                const lastName = document.getElementById('last-name') ? document.getElementById('last-name').value.trim() : '';
+                const firstName = document.getElementById('first-name') ? document.getElementById('first-name').value.trim() : '';
+                const birthDate = document.getElementById('birth-date') ? document.getElementById('birth-date').value : '';
+
+                if (!lastName || !firstName || !birthDate) {
+                    showNotification('Заполните все обязательные поля для личных данных: Фамилия, Имя и Дата рождения');
+                    return;
+                }
+
+                personalData = {
+                    lastName: lastName,
+                    firstName: firstName,
+                    middleName: document.getElementById('middle-name') ? document.getElementById('middle-name').value.trim() : '',
+                    birthDate: birthDate,
+                    searchMethods: selectedMethods
+                };
+            } else {
+                personalData = {
+                    searchMethods: selectedMethods
+                };
+            }
+
+            secureFetch(`${API_URL}/save_personal_data`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    privacyMethod: 'custom',
+                    personalData: personalData
+                })
+            })
+            .then(data => {
+                if (data.success) {
+                    showNotification('Настройки приватности сохранены');
+                    closeModal('personal-data-modal');
+                } else {
+                    showNotification(data.message || 'Ошибка сохранения данных');
+                }
+            })
+            .catch(err => {
+                console.error('Ошибка сохранения личных данных:', err);
+                showNotification('Ошибка сохранения личных данных');
+            });
+        }
+
+        function saveActivationSettingsAndRefresh() {
+            if (typeof saveActivationSettings === 'function') {
+                saveActivationSettings();
+                
+                // Ждем сохранения настроек, затем обновляем статус проверки активности
+                setTimeout(function() {
+                    if (typeof loadAliveCheckStatus === 'function') {
+                        loadAliveCheckStatus();
+                    }
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>
